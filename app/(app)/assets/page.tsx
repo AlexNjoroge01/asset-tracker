@@ -9,49 +9,61 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
-import { assets } from "@/lib/db/schema";
-import { and, eq, sql } from "drizzle-orm";
+import { assets, scans } from "@/lib/db/schema";
+import { and, eq, desc, inArray } from "drizzle-orm";
 import type { Asset, AssetCategory, AssetStatus } from "@/types";
+
+export const dynamic = "force-dynamic";
 
 async function getAssets(params: {
   status?: string;
   category?: string;
 }): Promise<Asset[]> {
   const conditions = [];
-  if (params.status) conditions.push(eq(assets.status, params.status as AssetStatus));
+  if (params.status)   conditions.push(eq(assets.status,   params.status   as AssetStatus));
   if (params.category) conditions.push(eq(assets.category, params.category as AssetCategory));
   const where = conditions.length > 0 ? and(...conditions) : undefined;
 
-  const rows = await db
-    .select({
-      id: assets.id,
-      name: assets.name,
-      category: assets.category,
-      description: assets.description,
-      qrCode: assets.qrCode,
-      status: assets.status,
-      createdBy: assets.createdBy,
-      createdAt: assets.createdAt,
-      latestScanLat: sql<string>`(SELECT latitude FROM scans WHERE asset_id = ${assets.id} ORDER BY scanned_at DESC LIMIT 1)`,
-      latestScanLng: sql<string>`(SELECT longitude FROM scans WHERE asset_id = ${assets.id} ORDER BY scanned_at DESC LIMIT 1)`,
-      latestScanAt: sql<string>`(SELECT scanned_at FROM scans WHERE asset_id = ${assets.id} ORDER BY scanned_at DESC LIMIT 1)`,
-      latestScanAccuracy: sql<string>`(SELECT accuracy FROM scans WHERE asset_id = ${assets.id} ORDER BY scanned_at DESC LIMIT 1)`,
-    })
+  const assetRows = await db
+    .select()
     .from(assets)
     .where(where)
     .orderBy(assets.createdAt);
 
-  return rows.map((r) => ({
-    ...r,
-    latestScan: r.latestScanLat
-      ? {
-          latitude: parseFloat(r.latestScanLat),
-          longitude: parseFloat(r.latestScanLng!),
-          scannedAt: new Date(r.latestScanAt!),
-          accuracy: r.latestScanAccuracy ? parseFloat(r.latestScanAccuracy) : null,
-        }
-      : null,
-  })) as Asset[];
+  if (assetRows.length === 0) return [];
+
+  const assetIds = assetRows.map((a) => a.id);
+
+  const latestScanRows = await db
+    .selectDistinctOn([scans.assetId], {
+      assetId:   scans.assetId,
+      latitude:  scans.latitude,
+      longitude: scans.longitude,
+      scannedAt: scans.scannedAt,
+      accuracy:  scans.accuracy,
+    })
+    .from(scans)
+    .where(inArray(scans.assetId, assetIds))
+    .orderBy(scans.assetId, desc(scans.scannedAt));
+
+  const latestByAsset = new Map(latestScanRows.map((s) => [s.assetId, s]));
+
+  return assetRows.map((asset) => {
+    const ls = latestByAsset.get(asset.id);
+    return {
+      ...asset,
+      category: asset.category as Asset["category"],
+      status:   asset.status   as Asset["status"],
+      latestScan: ls
+        ? {
+            latitude:  parseFloat(ls.latitude  as unknown as string),
+            longitude: parseFloat(ls.longitude as unknown as string),
+            scannedAt: ls.scannedAt,
+            accuracy:  ls.accuracy ? parseFloat(ls.accuracy as unknown as string) : null,
+          }
+        : null,
+    };
+  });
 }
 
 interface PageProps {
@@ -66,8 +78,8 @@ export default async function AssetsPage({ searchParams }: PageProps) {
   const assetList = await getAssets(params);
 
   return (
-    <div className="flex flex-col gap-6 p-6">
-      <div className="flex items-center justify-between">
+    <div className="flex flex-col gap-4 p-4 sm:gap-6 sm:p-6">
+      <div className="flex items-center justify-between gap-3">
         <div>
           <h1 className="text-xl font-semibold">Assets</h1>
           <p className="text-sm text-muted-foreground mt-0.5">
@@ -95,7 +107,7 @@ export default async function AssetsPage({ searchParams }: PageProps) {
           actionHref="/assets/new"
         />
       ) : (
-        <div className="rounded-lg border border-border overflow-hidden">
+        <div className="rounded-lg border border-border overflow-x-auto">
           <Suspense fallback={<AssetTableSkeleton />}>
             <AssetTable assets={assetList} />
           </Suspense>

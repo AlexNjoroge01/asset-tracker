@@ -1,24 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import dynamic from "next/dynamic";
 import Link from "next/link";
-import { ArrowLeft, Pencil, Trash2, Loader2, Smartphone, Tablet, Monitor } from "lucide-react";
+import { ArrowLeft, Loader2, MapPin, Smartphone, Tablet, Monitor } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card, CardContent, CardHeader, CardTitle,
-} from "@/components/ui/card";
-import {
-  Tabs, TabsContent, TabsList, TabsTrigger,
-} from "@/components/ui/tabs";
-import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
-} from "@/components/ui/dialog";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
@@ -61,7 +51,6 @@ interface AssetDetailTabsProps {
 
 export function AssetDetailTabs({ asset }: AssetDetailTabsProps) {
   const router = useRouter();
-  const [editOpen, setEditOpen] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
 
   const form = useForm<UpdateAssetInput>({
@@ -87,7 +76,6 @@ export function AssetDetailTabs({ asset }: AssetDetailTabsProps) {
       return;
     }
     toast.success("Changes saved.");
-    setEditOpen(false);
     router.refresh();
   }
 
@@ -102,9 +90,9 @@ export function AssetDetailTabs({ asset }: AssetDetailTabsProps) {
   }
 
   return (
-    <div className="flex flex-col gap-6 p-6 max-w-4xl">
+    <div className="flex flex-col">
       {/* Header */}
-      <div className="flex items-start gap-4">
+      <div className="flex items-start gap-3 p-4 pb-3 sm:p-6 sm:pb-4">
         <Button asChild variant="ghost" size="icon" className="h-8 w-8 shrink-0 mt-0.5">
           <Link href="/assets">
             <ArrowLeft className="h-4 w-4" />
@@ -124,117 +112,203 @@ export function AssetDetailTabs({ asset }: AssetDetailTabsProps) {
             <p className="text-sm text-muted-foreground">{asset.description}</p>
           )}
         </div>
-        <div className="flex items-center gap-2 shrink-0">
-          <Button variant="outline" size="sm" onClick={() => setEditOpen(true)}>
-            <Pencil className="h-3.5 w-3.5 mr-2" />
-            Edit
-          </Button>
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button variant="outline" size="sm" className="text-destructive border-destructive/30 hover:bg-destructive/10">
-                <Trash2 className="h-3.5 w-3.5 mr-2" />
-                Deactivate
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Deactivate asset?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This will mark &quot;{asset.name}&quot; as inactive. It won&apos;t appear on the map dashboard. You can reactivate it later.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={handleDelete}
-                  className="bg-destructive hover:bg-destructive/90"
-                >
-                  Deactivate
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        </div>
       </div>
 
       <Separator />
 
-      <Tabs defaultValue="overview">
-        <TabsList>
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="history">Scan History ({asset.scans.length})</TabsTrigger>
-          <TabsTrigger value="qr">QR Code</TabsTrigger>
-        </TabsList>
-
-        {/* Overview */}
-        <TabsContent value="overview" className="mt-4">
-          <div className="grid gap-4 md:grid-cols-2">
-            <Card className="border-border">
-              <CardHeader>
-                <CardTitle className="text-sm">Last Known Location</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {asset.latestScan ? (
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Coordinates</span>
-                      <span className="font-mono text-xs">
-                        {formatCoords(asset.latestScan.latitude, asset.latestScan.longitude)}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Last scan</span>
-                      <span>{formatRelativeTime(asset.latestScan.scannedAt)}</span>
-                    </div>
-                    {asset.latestScan.accuracy && (
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Accuracy</span>
-                        <span>±{Math.round(asset.latestScan.accuracy)}m</span>
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <p className="text-sm text-muted-foreground">No scans recorded yet.</p>
-                )}
-              </CardContent>
-            </Card>
-
-            <Card className="border-border">
-              <CardHeader>
-                <CardTitle className="text-sm">Asset Info</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Total scans</span>
-                    <span>{asset.scans.length}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Created</span>
-                    <span>{formatRelativeTime(asset.createdAt)}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">QR ID</span>
-                    <span className="font-mono text-[10px] text-muted-foreground truncate max-w-[120px]">
-                      {asset.qrCode}
-                    </span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+      {/* Two-column body */}
+      <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-border">
+        {/* ── Left: Asset Details (editable) ── */}
+        <div className="flex flex-col p-4 gap-5 sm:p-6 sm:gap-6">
+          <div>
+            <h2 className="text-base font-semibold">Asset Details</h2>
+            <p className="text-sm text-muted-foreground mt-0.5">
+              Update the information about this asset.
+            </p>
           </div>
-        </TabsContent>
 
-        {/* Scan History */}
-        <TabsContent value="history" className="mt-4">
-          {asset.scans.length === 0 ? (
-            <Card className="border-border border-dashed">
-              <CardContent className="py-12 text-center text-sm text-muted-foreground">
-                No scans yet. Scan the QR code to start tracking.
-              </CardContent>
-            </Card>
+          {/* Last known location summary */}
+          {asset.latestScan ? (
+            <div className="rounded-lg border border-border bg-muted/20 p-4 space-y-2 text-sm">
+              <div className="flex items-center gap-1.5 text-muted-foreground font-medium text-xs uppercase tracking-wide mb-2">
+                <MapPin className="h-3 w-3" />
+                Last Known Location
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Coordinates</span>
+                <span className="font-mono text-xs">
+                  {formatCoords(asset.latestScan.latitude, asset.latestScan.longitude)}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Last scan</span>
+                <span>{formatRelativeTime(asset.latestScan.scannedAt)}</span>
+              </div>
+              {asset.latestScan.accuracy && (
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Accuracy</span>
+                  <span>±{Math.round(asset.latestScan.accuracy)}m</span>
+                </div>
+              )}
+            </div>
           ) : (
-            <div className="rounded-lg border border-border overflow-hidden">
+            <div className="rounded-lg border border-dashed border-border/50 bg-muted/10 p-4 text-center text-sm text-muted-foreground">
+              No scans recorded yet. Scan the QR code to start tracking.
+            </div>
+          )}
+
+          {/* Edit form */}
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onEditSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Name</FormLabel>
+                    <FormControl><Input {...field} /></FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div className="grid grid-cols-1 min-[400px]:grid-cols-2 gap-3 sm:gap-4">
+                <FormField
+                  control={form.control}
+                  name="category"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Category</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
+                        <SelectContent>
+                          <SelectItem value="laptop">Laptop</SelectItem>
+                          <SelectItem value="phone">Phone</SelectItem>
+                          <SelectItem value="router">Router</SelectItem>
+                          <SelectItem value="tablet">Tablet</SelectItem>
+                          <SelectItem value="other">Other</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="status"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Status</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
+                        <SelectContent>
+                          <SelectItem value="active">Active</SelectItem>
+                          <SelectItem value="inactive">Inactive</SelectItem>
+                          <SelectItem value="lost">Lost</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      Description{" "}
+                      <span className="text-muted-foreground font-normal">(optional)</span>
+                    </FormLabel>
+                    <FormControl>
+                      <Textarea className="resize-none" rows={3} {...field} value={field.value ?? ""} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div className="flex items-center gap-3 pt-1">
+                <Button type="submit" disabled={isUpdating} className="flex-1">
+                  {isUpdating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Save Changes
+                </Button>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="text-destructive border-destructive/30 hover:bg-destructive/10"
+                    >
+                      Deactivate
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Deactivate asset?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This will mark &quot;{asset.name}&quot; as inactive. It won&apos;t appear
+                        on the map dashboard. You can reactivate it later.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={handleDelete}
+                        className="bg-destructive hover:bg-destructive/90"
+                      >
+                        Deactivate
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
+            </form>
+          </Form>
+        </div>
+
+        {/* ── Right: QR Code ── */}
+        <div className="flex flex-col p-4 gap-5 sm:p-6 sm:gap-6">
+          <div>
+            <h2 className="text-base font-semibold">QR Code</h2>
+            <p className="text-sm text-muted-foreground mt-0.5">
+              Scan this code to record the asset&apos;s location.
+            </p>
+          </div>
+
+          <QRCodeDisplay assetId={asset.id} assetName={asset.name} />
+
+          {/* Asset meta */}
+          <div className="rounded-lg border border-border bg-muted/10 p-4 space-y-2 text-sm">
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Total scans</span>
+              <span className="font-medium">{asset.scans.length}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Created</span>
+              <span>{formatRelativeTime(asset.createdAt)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">QR ID</span>
+              <span className="font-mono text-[10px] text-muted-foreground truncate max-w-[160px]">
+                {asset.qrCode}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Scan History (full width) ── */}
+      {asset.scans.length > 0 && (
+        <>
+          <Separator />
+          <div className="p-4 sm:p-6">
+            <h2 className="text-base font-semibold mb-4">
+              Scan History{" "}
+              <span className="text-muted-foreground font-normal text-sm">
+                ({asset.scans.length})
+              </span>
+            </h2>
+            <div className="rounded-lg border border-border overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -288,99 +362,9 @@ export function AssetDetailTabs({ asset }: AssetDetailTabsProps) {
                 </TableBody>
               </Table>
             </div>
-          )}
-        </TabsContent>
-
-        {/* QR Code */}
-        <TabsContent value="qr" className="mt-4">
-          <QRCodeDisplay assetId={asset.id} assetName={asset.name} />
-        </TabsContent>
-      </Tabs>
-
-      {/* Edit dialog */}
-      <Dialog open={editOpen} onOpenChange={setEditOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Edit Asset</DialogTitle>
-            <DialogDescription>Update the details for this asset.</DialogDescription>
-          </DialogHeader>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onEditSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Name</FormLabel>
-                    <FormControl><Input {...field} /></FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="category"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Category</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
-                      <SelectContent>
-                        <SelectItem value="laptop">Laptop</SelectItem>
-                        <SelectItem value="phone">Phone</SelectItem>
-                        <SelectItem value="router">Router</SelectItem>
-                        <SelectItem value="tablet">Tablet</SelectItem>
-                        <SelectItem value="other">Other</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="status"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Status</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
-                      <SelectContent>
-                        <SelectItem value="active">Active</SelectItem>
-                        <SelectItem value="inactive">Inactive</SelectItem>
-                        <SelectItem value="lost">Lost</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Description</FormLabel>
-                    <FormControl>
-                      <Textarea className="resize-none" rows={3} {...field} value={field.value ?? ""} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => setEditOpen(false)}>
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={isUpdating}>
-                  {isUpdating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Save changes
-                </Button>
-              </DialogFooter>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
+          </div>
+        </>
+      )}
     </div>
   );
 }

@@ -56,83 +56,89 @@ export function AssetTable({ assets, onDeleted }: AssetTableProps) {
 
   return (
     <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Name</TableHead>
-          <TableHead>Category</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead>Last Seen</TableHead>
-          <TableHead className="font-mono text-xs">Coordinates</TableHead>
-          <TableHead className="w-10" />
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {assets.map((asset) => (
-          <TableRow key={asset.id}>
-            <TableCell className="font-medium">
-              <Link
-                href={`/assets/${asset.id}`}
-                className="hover:text-primary transition-colors"
-              >
-                {asset.name}
-              </Link>
-            </TableCell>
-            <TableCell>
-              <Badge
-                className={categoryVariant[asset.category] ?? categoryVariant.other}
-                variant="outline"
-              >
-                {asset.category}
-              </Badge>
-            </TableCell>
-            <TableCell>
-              <Badge className={statusVariant[asset.status]} variant="outline">
-                {asset.status}
-              </Badge>
-            </TableCell>
-            <TableCell className="text-muted-foreground text-xs">
-              {asset.latestScan
-                ? formatRelativeTime(asset.latestScan.scannedAt)
-                : "Never"}
-            </TableCell>
-            <TableCell>
-              <span className="font-mono text-xs text-muted-foreground">
-                {asset.latestScan
-                  ? formatCoords(
-                      asset.latestScan.latitude,
-                      asset.latestScan.longitude
-                    )
-                  : "—"}
-              </span>
-            </TableCell>
-            <TableCell>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-8 w-8">
-                    <MoreHorizontal className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem asChild>
-                    <Link href={`/assets/${asset.id}`} className="flex items-center gap-2">
-                      <ExternalLink className="h-3.5 w-3.5" />
-                      View details
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    className="text-destructive focus:text-destructive flex items-center gap-2 cursor-pointer"
-                    onClick={() => handleDelete(asset.id, asset.name)}
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                    Deactivate
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </TableCell>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Name</TableHead>
+            <TableHead className="hidden sm:table-cell">Category</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead className="hidden sm:table-cell">Last Seen</TableHead>
+            <TableHead className="hidden md:table-cell font-mono text-xs">Coordinates</TableHead>
+            <TableHead className="w-10" />
           </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+        </TableHeader>
+        <TableBody>
+          {assets.map((asset) => (
+            <TableRow key={asset.id}>
+              <TableCell className="font-medium">
+                <Link
+                  href={`/assets/${asset.id}`}
+                  className="hover:text-primary transition-colors"
+                >
+                  {asset.name}
+                </Link>
+                {/* Show last-seen inline on mobile where the column is hidden */}
+                <p className="sm:hidden text-[11px] text-muted-foreground mt-0.5">
+                  {asset.latestScan
+                    ? formatRelativeTime(asset.latestScan.scannedAt)
+                    : "Never scanned"}
+                </p>
+              </TableCell>
+              <TableCell className="hidden sm:table-cell">
+                <Badge
+                  className={categoryVariant[asset.category] ?? categoryVariant.other}
+                  variant="outline"
+                >
+                  {asset.category}
+                </Badge>
+              </TableCell>
+              <TableCell>
+                <Badge className={statusVariant[asset.status]} variant="outline">
+                  {asset.status}
+                </Badge>
+              </TableCell>
+              <TableCell className="hidden sm:table-cell text-muted-foreground text-xs">
+                {asset.latestScan
+                  ? formatRelativeTime(asset.latestScan.scannedAt)
+                  : "Never"}
+              </TableCell>
+              <TableCell className="hidden md:table-cell">
+                <span className="font-mono text-xs text-muted-foreground">
+                  {asset.latestScan
+                    ? formatCoords(
+                        asset.latestScan.latitude,
+                        asset.latestScan.longitude
+                      )
+                    : "—"}
+                </span>
+              </TableCell>
+              <TableCell>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem asChild>
+                      <Link href={`/assets/${asset.id}`} className="flex items-center gap-2">
+                        <ExternalLink className="h-3.5 w-3.5" />
+                        View details
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      className="text-destructive focus:text-destructive flex items-center gap-2 cursor-pointer"
+                      onClick={() => handleDelete(asset.id, asset.name)}
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                      Deactivate
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
   );
 }

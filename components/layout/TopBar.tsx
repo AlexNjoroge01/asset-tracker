@@ -1,7 +1,7 @@
 "use client";
 
 import { signOut } from "next-auth/react";
-import { LogOut, User, Settings } from "lucide-react";
+import { LogOut, Settings } from "lucide-react";
 import Link from "next/link";
 import {
   DropdownMenu,
@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 interface TopBarProps {
   userName?: string | null;
@@ -32,15 +33,18 @@ function getInitials(name?: string | null) {
 export function TopBar({ userName, userEmail }: TopBarProps) {
   return (
     <header className="flex h-14 items-center justify-between border-b border-border bg-card px-4 md:px-6">
+      {/* Left spacer (mobile hamburger lives in Sidebar) */}
       <div className="flex items-center gap-2 md:hidden w-8" />
       <div className="hidden md:block" />
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1">
+        <ThemeToggle />
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+            <Button variant="ghost" className="relative h-9 w-9 rounded-full ml-1">
               <Avatar className="h-8 w-8">
-                <AvatarFallback className="bg-primary/20 text-primary text-xs font-semibold">
+                <AvatarFallback className="bg-primary/15 text-primary text-xs font-semibold border border-primary/20">
                   {getInitials(userName)}
                 </AvatarFallback>
               </Avatar>
@@ -48,7 +52,7 @@ export function TopBar({ userName, userEmail }: TopBarProps) {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48">
             <DropdownMenuLabel>
-              <div className="flex flex-col space-y-1">
+              <div className="flex flex-col space-y-0.5">
                 <p className="text-sm font-medium">{userName ?? "User"}</p>
                 <p className="text-xs text-muted-foreground truncate">{userEmail}</p>
               </div>

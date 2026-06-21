@@ -25,7 +25,7 @@ export function DashboardShell({ initialStats }: DashboardShellProps) {
   return (
     <div className="flex h-full flex-col">
       {/* Stats bar */}
-      <div className="grid grid-cols-2 gap-3 p-4 md:grid-cols-4 shrink-0">
+      <div className="grid grid-cols-2 gap-2 p-3 sm:gap-3 sm:p-4 md:grid-cols-4 shrink-0">
         <StatCard
           label="Total Assets"
           value={stats.totalAssets}

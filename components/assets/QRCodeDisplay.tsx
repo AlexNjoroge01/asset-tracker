@@ -44,7 +44,7 @@ export function QRCodeDisplay({ assetId, assetName }: QRCodeDisplayProps) {
         <CardTitle className="text-base">QR Code — {assetName}</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col items-center gap-4">
-        <div className="flex h-[200px] w-[200px] items-center justify-center rounded-lg bg-white p-2">
+        <div className="flex h-[170px] w-[170px] sm:h-[200px] sm:w-[200px] items-center justify-center rounded-lg bg-white p-2">
           {src ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
@@ -52,13 +52,13 @@ export function QRCodeDisplay({ assetId, assetName }: QRCodeDisplayProps) {
               alt={`QR code for ${assetName}`}
               width={180}
               height={180}
-              className="rounded"
+              className="rounded w-full h-full object-contain"
             />
           ) : (
-            <Skeleton className="h-[180px] w-[180px]" />
+            <Skeleton className="h-full w-full" />
           )}
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap justify-center gap-2">
           {src && (
             <Button asChild variant="default" size="sm">
               <a href={src} download={`qr-${assetName.replace(/\s+/g, "-")}.png`}>

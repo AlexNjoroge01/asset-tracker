@@ -3,57 +3,112 @@
 
 @custom-variant dark (&:is(.dark *));
 
-:root {
-  --background: 222.2 84% 4.9%;
-  --foreground: 210 40% 98%;
-  --card: 222.2 84% 4.9%;
-  --card-foreground: 210 40% 98%;
-  --popover: 222.2 84% 4.9%;
-  --popover-foreground: 210 40% 98%;
-  --primary: 199 89% 60%;
-  --primary-foreground: 222.2 47.4% 11.2%;
-  --secondary: 217.2 32.6% 17.5%;
-  --secondary-foreground: 210 40% 98%;
-  --muted: 217.2 32.6% 17.5%;
-  --muted-foreground: 215 20.2% 65.1%;
-  --accent: 217.2 32.6% 17.5%;
-  --accent-foreground: 210 40% 98%;
-  --destructive: 0 62.8% 30.6%;
-  --destructive-foreground: 210 40% 98%;
-  --border: 217.2 32.6% 17.5%;
-  --input: 217.2 32.6% 17.5%;
-  --ring: 199 89% 60%;
-  --radius: 0.5rem;
-  --sidebar-background: 222.2 84% 6%;
-  --sidebar-foreground: 210 40% 98%;
-  --sidebar-primary: 199 89% 60%;
-  --sidebar-primary-foreground: 222.2 47.4% 11.2%;
-  --sidebar-accent: 217.2 32.6% 17.5%;
-  --sidebar-accent-foreground: 210 40% 98%;
-  --sidebar-border: 217.2 32.6% 17.5%;
-  --sidebar-ring: 199 89% 60%;
+/* ── Custom breakpoint: xs (< sm) ── */
+@theme {
+  --breakpoint-xs: 400px;
 }
 
+/* ── Notch / safe-area support ── */
+@layer base {
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   LIGHT THEME  (:root)
+   Clean off-white with violet accents
+═══════════════════════════════════════════ */
+:root {
+  --background:          224 30% 97%;
+  --foreground:          270 50% 10%;
+  --card:                0 0% 100%;
+  --card-foreground:     270 50% 10%;
+  --popover:             0 0% 100%;
+  --popover-foreground:  270 50% 10%;
+  --primary:             267 84% 56%;
+  --primary-foreground:  0 0% 100%;
+  --secondary:           267 20% 93%;
+  --secondary-foreground:267 50% 22%;
+  --muted:               267 15% 94%;
+  --muted-foreground:    267 14% 50%;
+  --accent:              267 30% 91%;
+  --accent-foreground:   267 70% 38%;
+  --destructive:         0 72% 51%;
+  --destructive-foreground: 0 0% 100%;
+  --border:              267 18% 87%;
+  --input:               267 18% 92%;
+  --ring:                267 84% 56%;
+  --radius:              0.75rem;
+
+  --sidebar-background:  267 20% 96%;
+  --sidebar-foreground:  270 50% 10%;
+  --sidebar-primary:     267 84% 56%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent:      267 28% 90%;
+  --sidebar-accent-foreground: 267 70% 38%;
+  --sidebar-border:      267 18% 87%;
+  --sidebar-ring:        267 84% 56%;
+}
+
+/* ═══════════════════════════════════════════
+   DARK THEME  (.dark on <html>)
+   Deep purple-black space aesthetic
+═══════════════════════════════════════════ */
+.dark {
+  --background:          268 42% 6%;
+  --foreground:          267 30% 92%;
+  --card:                268 38% 10%;
+  --card-foreground:     267 30% 92%;
+  --popover:             268 40% 9%;
+  --popover-foreground:  267 30% 92%;
+  --primary:             267 84% 63%;
+  --primary-foreground:  0 0% 100%;
+  --secondary:           268 32% 16%;
+  --secondary-foreground:267 30% 92%;
+  --muted:               268 32% 13%;
+  --muted-foreground:    267 18% 58%;
+  --accent:              267 40% 19%;
+  --accent-foreground:   267 90% 82%;
+  --destructive:         0 72% 56%;
+  --destructive-foreground: 0 0% 100%;
+  --border:              268 34% 18%;
+  --input:               268 36% 11%;
+  --ring:                267 84% 63%;
+
+  --sidebar-background:  268 50% 4%;
+  --sidebar-foreground:  267 30% 92%;
+  --sidebar-primary:     267 84% 63%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent:      267 40% 17%;
+  --sidebar-accent-foreground: 267 90% 82%;
+  --sidebar-border:      268 36% 14%;
+  --sidebar-ring:        267 84% 63%;
+}
+
+/* ═══════════════════════════════════════════
+   Tailwind v4 theme token mapping
+═══════════════════════════════════════════ */
 @theme inline {
-  --color-background: hsl(var(--background));
-  --color-foreground: hsl(var(--foreground));
-  --color-card: hsl(var(--card));
-  --color-card-foreground: hsl(var(--card-foreground));
-  --color-popover: hsl(var(--popover));
-  --color-popover-foreground: hsl(var(--popover-foreground));
-  --color-primary: hsl(var(--primary));
-  --color-primary-foreground: hsl(var(--primary-foreground));
-  --color-secondary: hsl(var(--secondary));
-  --color-secondary-foreground: hsl(var(--secondary-foreground));
-  --color-muted: hsl(var(--muted));
-  --color-muted-foreground: hsl(var(--muted-foreground));
-  --color-accent: hsl(var(--accent));
+  --color-background:        hsl(var(--background));
+  --color-foreground:        hsl(var(--foreground));
+  --color-card:              hsl(var(--card));
+  --color-card-foreground:   hsl(var(--card-foreground));
+  --color-popover:           hsl(var(--popover));
+  --color-popover-foreground:hsl(var(--popover-foreground));
+  --color-primary:           hsl(var(--primary));
+  --color-primary-foreground:hsl(var(--primary-foreground));
+  --color-secondary:         hsl(var(--secondary));
+  --color-secondary-foreground:hsl(var(--secondary-foreground));
+  --color-muted:             hsl(var(--muted));
+  --color-muted-foreground:  hsl(var(--muted-foreground));
+  --color-accent:            hsl(var(--accent));
   --color-accent-foreground: hsl(var(--accent-foreground));
-  --color-destructive: hsl(var(--destructive));
-  --color-destructive-foreground: hsl(var(--destructive-foreground));
-  --color-border: hsl(var(--border));
-  --color-input: hsl(var(--input));
-  --color-ring: hsl(var(--ring));
+  --color-destructive:       hsl(var(--destructive));
+  --color-destructive-foreground:hsl(var(--destructive-foreground));
+  --color-border:            hsl(var(--border));
+  --color-input:             hsl(var(--input));
+  --color-ring:              hsl(var(--ring));
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -62,16 +117,137 @@
   --font-mono: var(--font-jetbrains-mono);
 }
 
+/* ═══════════════════════════════════════════
+   Base resets
+═══════════════════════════════════════════ */
 * {
   border-color: hsl(var(--border));
 }
+
+html { scroll-behavior: smooth; }
 
 body {
   background-color: hsl(var(--background));
   color: hsl(var(--foreground));
 }
 
-/* Leaflet z-index fixes for Next.js */
+/* ═══════════════════════════════════════════
+   DARK — dramatic nebula body gradient
+   Strong violet crown + cyan bottom accent
+═══════════════════════════════════════════ */
+.dark body {
+  background-color: hsl(var(--background));
+  background-image:
+    radial-gradient(ellipse 110% 45% at 50% 0px,
+      hsl(267 84% 63% / 0.18) 0%, transparent 55%),
+    radial-gradient(ellipse 60% 40% at 95% 100%,
+      hsl(190 80% 55% / 0.10) 0%, transparent 50%),
+    radial-gradient(ellipse 40% 30% at 5% 70%,
+      hsl(280 60% 40% / 0.07) 0%, transparent 45%);
+}
+
+/* ═══════════════════════════════════════════
+   DARK — glass header / topbar
+═══════════════════════════════════════════ */
+.dark header {
+  background: hsl(268 40% 9% / 0.75) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  border-bottom: 1px solid hsl(268 34% 20% / 0.6) !important;
+  box-shadow: 0 1px 0 0 hsl(267 84% 63% / 0.06);
+}
+
+/* ═══════════════════════════════════════════
+   DARK — glass mobile bottom nav
+═══════════════════════════════════════════ */
+.dark nav.fixed.bottom-0 {
+  background: hsl(268 40% 9% / 0.85) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  border-top: 1px solid hsl(268 34% 20% / 0.6) !important;
+}
+
+/* ═══════════════════════════════════════════
+   DARK — sidebar
+═══════════════════════════════════════════ */
+.dark aside {
+  background: hsl(var(--sidebar-background)) !important;
+  border-right: 1px solid hsl(268 36% 15% / 0.8) !important;
+  box-shadow: 1px 0 0 0 hsl(268 34% 18% / 0.4),
+              6px 0 32px 0 hsl(267 84% 63% / 0.04);
+}
+
+/* ═══════════════════════════════════════════
+   DARK — card glassmorphism
+   Gradient background + glowing border
+═══════════════════════════════════════════ */
+.dark .rounded-lg.border.shadow-sm {
+  background: linear-gradient(
+    145deg,
+    hsl(268 38% 13%) 0%,
+    hsl(268 34% 10%) 100%
+  ) !important;
+  border-color: hsl(268 36% 22%) !important;
+  box-shadow:
+    0 0 0 1px hsl(267 50% 20% / 0.25),
+    0 4px 20px 0 hsl(0 0% 0% / 0.35),
+    inset 0 1px 0 0 hsl(267 84% 63% / 0.07);
+}
+
+/* ═══════════════════════════════════════════
+   DARK — dropdown / popover glass
+═══════════════════════════════════════════ */
+.dark [role="menu"],
+.dark [role="listbox"],
+.dark [role="dialog"] .rounded-lg,
+.dark [data-radix-popper-content-wrapper] > div {
+  background: hsl(268 40% 10% / 0.95) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  border: 1px solid hsl(268 34% 22%) !important;
+  box-shadow: 0 8px 32px hsl(0 0% 0% / 0.5),
+              0 0 0 1px hsl(267 84% 63% / 0.12) !important;
+}
+
+/* ═══════════════════════════════════════════
+   DARK — primary button glow
+═══════════════════════════════════════════ */
+.dark .bg-primary {
+  box-shadow: 0 0 18px 0 hsl(267 84% 63% / 0.4);
+}
+.dark .bg-primary:hover {
+  box-shadow: 0 0 26px 0 hsl(267 84% 63% / 0.55);
+}
+
+/* ═══════════════════════════════════════════
+   DARK — input / focus ring
+═══════════════════════════════════════════ */
+.dark input,
+.dark textarea,
+.dark select {
+  background: hsl(268 38% 9%) !important;
+  border-color: hsl(268 34% 20%) !important;
+}
+.dark input:focus,
+.dark textarea:focus {
+  box-shadow: 0 0 0 2px hsl(267 84% 63% / 0.3) !important;
+  border-color: hsl(267 84% 63% / 0.5) !important;
+}
+
+/* ═══════════════════════════════════════════
+   DARK — custom scrollbar
+═══════════════════════════════════════════ */
+.dark * {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(268 34% 20%) transparent;
+}
+.dark ::-webkit-scrollbar        { width: 4px; height: 4px; }
+.dark ::-webkit-scrollbar-thumb  { background: hsl(268 34% 20%); border-radius: 2px; }
+.dark ::-webkit-scrollbar-track  { background: transparent; }
+
+/* ═══════════════════════════════════════════
+   Leaflet — z-index fixes
+═══════════════════════════════════════════ */
 .leaflet-pane,
 .leaflet-tile,
 .leaflet-marker-icon,
@@ -87,30 +263,38 @@ body {
   top: 0;
 }
 
-.leaflet-container {
-  overflow: hidden;
-}
+.leaflet-container { overflow: hidden; }
 
 .leaflet-tile,
 .leaflet-marker-icon,
-.leaflet-marker-shadow {
-  user-select: none;
-}
+.leaflet-marker-shadow { user-select: none; }
 
-/* Custom cluster icon */
+/* ═══════════════════════════════════════════
+   Marker cluster
+═══════════════════════════════════════════ */
 .marker-cluster-custom {
-  background: rgba(15, 23, 42, 0.9);
-  border: 2px solid #38bdf8;
+  background: hsl(268 38% 10% / 0.95);
+  border: 2px solid hsl(267 84% 63% / 0.65);
+  box-shadow: 0 0 12px 0 hsl(267 84% 63% / 0.3);
   border-radius: 50%;
-  color: #f1f5f9;
+  color: hsl(267 90% 82%);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 600;
-  font-size: 13px;
+  font-weight: 700;
+  font-size: 12px;
 }
 
-/* Asset pin */
+.light .marker-cluster-custom {
+  background: rgba(255, 255, 255, 0.95);
+  border: 2px solid hsl(267 84% 56% / 0.5);
+  box-shadow: 0 2px 8px hsl(267 84% 56% / 0.2);
+  color: hsl(267 70% 38%);
+}
+
+/* ═══════════════════════════════════════════
+   Asset pin
+═══════════════════════════════════════════ */
 .asset-pin {
   border-radius: 50%;
   display: flex;
@@ -118,69 +302,69 @@ body {
   justify-content: center;
   font-weight: 700;
   font-size: 11px;
-  color: #0f172a;
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+  border: 2px solid hsl(0 0% 100% / 0.3);
   cursor: pointer;
-  transition: transform 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 10px hsl(0 0% 0% / 0.45);
 }
 
 .asset-pin:hover {
-  transform: scale(1.15);
+  transform: scale(1.18);
+  box-shadow: 0 0 18px hsl(267 84% 63% / 0.55);
 }
 
-.asset-pin-lost {
-  animation: pulse-red 1.5s infinite;
-}
+.asset-pin-lost { animation: pulse-red 1.5s infinite; }
 
 @keyframes pulse-red {
-  0%, 100% {
-    box-shadow: 0 0 0 0 rgba(248, 113, 113, 0.6);
-  }
-  50% {
-    box-shadow: 0 0 0 8px rgba(248, 113, 113, 0);
-  }
+  0%, 100% { box-shadow: 0 0 0 0   hsl(0 72% 55% / 0.6); }
+  50%       { box-shadow: 0 0 0 8px hsl(0 72% 55% / 0); }
 }
 
-.asset-pin-new {
-  animation: pulse-scale 0.4s ease-out;
-}
+.asset-pin-new { animation: pulse-scale 0.4s ease-out; }
 
 @keyframes pulse-scale {
-  0% { transform: scale(1.4); }
+  0%   { transform: scale(1.4); }
   100% { transform: scale(1); }
 }
 
-/* Leaflet popup dark theme */
-.leaflet-popup-content-wrapper {
-  background: #1e293b;
-  color: #f1f5f9;
-  border: 1px solid #334155;
-  border-radius: 8px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+/* ═══════════════════════════════════════════
+   Leaflet popup
+═══════════════════════════════════════════ */
+.dark .leaflet-popup-content-wrapper {
+  background: hsl(268 38% 10% / 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  color: hsl(267 30% 92%);
+  border: 1px solid hsl(268 36% 22%);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px hsl(0 0% 0% / 0.5),
+              0 0 0 1px hsl(267 84% 63% / 0.12);
   padding: 0;
 }
 
-.leaflet-popup-content {
-  margin: 0;
-  width: auto !important;
+.leaflet-popup-content-wrapper {
+  padding: 0;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px hsl(0 0% 0% / 0.15);
 }
 
-.leaflet-popup-tip {
-  background: #1e293b;
+.leaflet-popup-content { margin: 0; width: auto !important; }
+
+.dark .leaflet-popup-tip {
+  background: hsl(268 38% 10% / 0.95);
 }
 
-.leaflet-popup-close-button {
-  color: #94a3b8 !important;
+.dark .leaflet-popup-close-button {
+  color: hsl(267 18% 58%) !important;
   top: 8px !important;
   right: 8px !important;
 }
 
-/* Print styles for QR code */
+/* ═══════════════════════════════════════════
+   Print — QR
+═══════════════════════════════════════════ */
 @media print {
-  body > * {
-    display: none;
-  }
-  .print-qr {
-    display: block !important;
-  }
+  body > * { display: none; }
+  .print-qr { display: block !important; }
 }

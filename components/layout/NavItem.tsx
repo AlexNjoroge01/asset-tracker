@@ -21,13 +21,18 @@ export function NavItem({ href, icon: Icon, label, onClick }: NavItemProps) {
       href={href}
       onClick={onClick}
       className={cn(
-        "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+        "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
         isActive
-          ? "bg-primary/10 text-primary"
+          ? "bg-primary/12 text-primary shadow-[inset_0_0_0_1px_hsl(var(--primary)/0.2)]"
           : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
       )}
     >
-      <Icon className="h-4 w-4 shrink-0" />
+      <Icon
+        className={cn(
+          "h-4 w-4 shrink-0 transition-colors",
+          isActive ? "text-primary drop-shadow-[0_0_6px_hsl(var(--primary)/0.6)]" : ""
+        )}
+      />
       {label}
     </Link>
   );

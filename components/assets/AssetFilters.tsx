@@ -28,9 +28,9 @@ export function AssetFilters() {
   }
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex flex-wrap gap-2">
       <Select value={status} onValueChange={(v) => update("status", v)}>
-        <SelectTrigger className="h-8 w-32 text-xs">
+        <SelectTrigger className="h-8 w-full xs:w-32 text-xs">
           <SelectValue placeholder="Status" />
         </SelectTrigger>
         <SelectContent>
@@ -42,7 +42,7 @@ export function AssetFilters() {
       </Select>
 
       <Select value={category} onValueChange={(v) => update("category", v)}>
-        <SelectTrigger className="h-8 w-36 text-xs">
+        <SelectTrigger className="h-8 w-full xs:w-36 text-xs">
           <SelectValue placeholder="Category" />
         </SelectTrigger>
         <SelectContent>
