@@ -3,9 +3,11 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { assets, scans, users } from "@/lib/db/schema";
-import { eq, desc, sql } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 import { AssetDetailTabs } from "@/components/assets/AssetDetailTabs";
 import type { AssetWithScans } from "@/types";
+
+export const dynamic = "force-dynamic";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -18,20 +20,7 @@ export default async function AssetDetailPage({ params }: PageProps) {
   const { id } = await params;
 
   const [asset] = await db
-    .select({
-      id: assets.id,
-      name: assets.name,
-      category: assets.category,
-      description: assets.description,
-      qrCode: assets.qrCode,
-      status: assets.status,
-      createdBy: assets.createdBy,
-      createdAt: assets.createdAt,
-      latestScanLat: sql<string>`(SELECT latitude FROM scans WHERE asset_id = ${assets.id} ORDER BY scanned_at DESC LIMIT 1)`,
-      latestScanLng: sql<string>`(SELECT longitude FROM scans WHERE asset_id = ${assets.id} ORDER BY scanned_at DESC LIMIT 1)`,
-      latestScanAt: sql<string>`(SELECT scanned_at FROM scans WHERE asset_id = ${assets.id} ORDER BY scanned_at DESC LIMIT 1)`,
-      latestScanAccuracy: sql<string>`(SELECT accuracy FROM scans WHERE asset_id = ${assets.id} ORDER BY scanned_at DESC LIMIT 1)`,
-    })
+    .select()
     .from(assets)
     .where(eq(assets.id, id))
     .limit(1);
@@ -56,23 +45,34 @@ export default async function AssetDetailPage({ params }: PageProps) {
     .where(eq(scans.assetId, id))
     .orderBy(desc(scans.scannedAt));
 
+  const parsedScans = scanRows.map((s) => ({
+    ...s,
+    latitude: parseFloat(s.latitude as unknown as string),
+    longitude: parseFloat(s.longitude as unknown as string),
+    accuracy: s.accuracy ? parseFloat(s.accuracy as unknown as string) : null,
+    scannerName: s.scannerName ?? undefined,
+  }));
+
+  const latest = parsedScans[0] ?? null;
+
   const assetWithScans: AssetWithScans = {
-    ...(asset as unknown as AssetWithScans),
-    latestScan: asset.latestScanLat
+    id: asset.id,
+    name: asset.name,
+    category: asset.category as AssetWithScans["category"],
+    description: asset.description,
+    qrCode: asset.qrCode,
+    status: asset.status as AssetWithScans["status"],
+    createdBy: asset.createdBy,
+    createdAt: asset.createdAt,
+    latestScan: latest
       ? {
-          latitude: parseFloat(asset.latestScanLat),
-          longitude: parseFloat(asset.latestScanLng!),
-          scannedAt: new Date(asset.latestScanAt!),
-          accuracy: asset.latestScanAccuracy ? parseFloat(asset.latestScanAccuracy) : null,
+          latitude: latest.latitude,
+          longitude: latest.longitude,
+          scannedAt: latest.scannedAt,
+          accuracy: latest.accuracy,
         }
       : null,
-    scans: scanRows.map((s) => ({
-      ...s,
-      latitude: parseFloat(s.latitude as unknown as string),
-      longitude: parseFloat(s.longitude as unknown as string),
-      accuracy: s.accuracy ? parseFloat(s.accuracy as unknown as string) : null,
-      scannerName: s.scannerName ?? undefined,
-    })),
+    scans: parsedScans,
   };
 
   return <AssetDetailTabs asset={assetWithScans} />;

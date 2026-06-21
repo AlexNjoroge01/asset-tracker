@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
+
+export const dynamic = "force-dynamic";
 import { db } from "@/lib/db";
 import { assets, scans } from "@/lib/db/schema";
 import { eq, gte, count, max, sql } from "drizzle-orm";

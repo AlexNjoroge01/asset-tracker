@@ -2,9 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { assets, scans } from "@/lib/db/schema";
-import { eq, and, sql } from "drizzle-orm";
+import { eq, and, desc, inArray } from "drizzle-orm";
 import { createAssetSchema } from "@/lib/validations/asset";
 import type { AssetCategory, AssetStatus } from "@/types";
+
+export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
   const session = await auth();
@@ -20,55 +22,44 @@ export async function GET(req: NextRequest) {
 
   const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
 
-  const rows = await db
-    .select({
-      id: assets.id,
-      name: assets.name,
-      category: assets.category,
-      description: assets.description,
-      qrCode: assets.qrCode,
-      status: assets.status,
-      createdBy: assets.createdBy,
-      createdAt: assets.createdAt,
-      latestScanLat: sql<string>`(
-        SELECT latitude FROM scans
-        WHERE asset_id = ${assets.id}
-        ORDER BY scanned_at DESC LIMIT 1
-      )`,
-      latestScanLng: sql<string>`(
-        SELECT longitude FROM scans
-        WHERE asset_id = ${assets.id}
-        ORDER BY scanned_at DESC LIMIT 1
-      )`,
-      latestScanAt: sql<string>`(
-        SELECT scanned_at FROM scans
-        WHERE asset_id = ${assets.id}
-        ORDER BY scanned_at DESC LIMIT 1
-      )`,
-      latestScanAccuracy: sql<string>`(
-        SELECT accuracy FROM scans
-        WHERE asset_id = ${assets.id}
-        ORDER BY scanned_at DESC LIMIT 1
-      )`,
-    })
+  const assetRows = await db
+    .select()
     .from(assets)
     .where(whereClause);
 
-  const result = rows.map((r) => ({
-    ...r,
-    latestScan: r.latestScanLat
-      ? {
-          latitude: parseFloat(r.latestScanLat),
-          longitude: parseFloat(r.latestScanLng!),
-          scannedAt: new Date(r.latestScanAt!),
-          accuracy: r.latestScanAccuracy ? parseFloat(r.latestScanAccuracy) : null,
-        }
-      : null,
-    latestScanLat: undefined,
-    latestScanLng: undefined,
-    latestScanAt: undefined,
-    latestScanAccuracy: undefined,
-  }));
+  if (assetRows.length === 0) return NextResponse.json([]);
+
+  // Fetch latest scan per asset using DISTINCT ON (asset_id) ordered by scanned_at DESC
+  const assetIds = assetRows.map((a) => a.id);
+
+  const latestScanRows = await db
+    .selectDistinctOn([scans.assetId], {
+      assetId: scans.assetId,
+      latitude: scans.latitude,
+      longitude: scans.longitude,
+      scannedAt: scans.scannedAt,
+      accuracy: scans.accuracy,
+    })
+    .from(scans)
+    .where(inArray(scans.assetId, assetIds))
+    .orderBy(scans.assetId, desc(scans.scannedAt));
+
+  const latestByAsset = new Map(latestScanRows.map((s) => [s.assetId, s]));
+
+  const result = assetRows.map((asset) => {
+    const ls = latestByAsset.get(asset.id);
+    return {
+      ...asset,
+      latestScan: ls
+        ? {
+            latitude: parseFloat(ls.latitude as unknown as string),
+            longitude: parseFloat(ls.longitude as unknown as string),
+            scannedAt: ls.scannedAt,
+            accuracy: ls.accuracy ? parseFloat(ls.accuracy as unknown as string) : null,
+          }
+        : null,
+    };
+  });
 
   return NextResponse.json(result);
 }
