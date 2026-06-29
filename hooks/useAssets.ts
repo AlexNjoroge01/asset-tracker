@@ -14,7 +14,7 @@ export function useAssets(params?: { status?: string; category?: string }) {
   const { data, error, isLoading, mutate } = useSWR<Asset[]>(
     `/api/assets${qs ? `?${qs}` : ""}`,
     fetcher,
-    { refreshInterval: 30000 }
+    { refreshInterval: 5000 }
   );
 
   return { assets: data ?? [], error, isLoading, mutate };

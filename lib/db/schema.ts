@@ -4,6 +4,7 @@ import {
   text,
   timestamp,
   numeric,
+  boolean,
   index,
 } from "drizzle-orm/pg-core";
 
@@ -31,6 +32,29 @@ export const assets = pgTable(
   (t) => [
     index("idx_assets_qr_code").on(t.qrCode),
     index("idx_assets_status").on(t.status),
+  ]
+);
+
+export const trackingSessions = pgTable(
+  "tracking_sessions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    assetId: uuid("asset_id")
+      .notNull()
+      .references(() => assets.id, { onDelete: "cascade" }),
+    sessionToken: uuid("session_token").notNull().unique().defaultRandom(),
+    latitude: numeric("latitude", { precision: 10, scale: 7 }).notNull(),
+    longitude: numeric("longitude", { precision: 10, scale: 7 }).notNull(),
+    accuracy: numeric("accuracy", { precision: 6, scale: 2 }),
+    deviceInfo: text("device_info"),
+    startedAt: timestamp("started_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+    isActive: boolean("is_active").notNull().default(true),
+  },
+  (t) => [
+    index("idx_tracking_asset_id").on(t.assetId),
+    index("idx_tracking_token").on(t.sessionToken),
+    index("idx_tracking_updated_at").on(t.updatedAt),
   ]
 );
 

@@ -59,12 +59,9 @@ function FlyToSelected({
   useEffect(() => {
     if (!selectedAssetId || selectedAssetId === prevId.current) return;
     const asset = assets.find((a) => a.id === selectedAssetId);
-    if (asset?.latestScan) {
-      map.flyTo(
-        [asset.latestScan.latitude, asset.latestScan.longitude],
-        16,
-        { duration: 1.2 }
-      );
+    const pos = asset?.liveSession ?? asset?.latestScan;
+    if (pos) {
+      map.flyTo([pos.latitude, pos.longitude], 16, { duration: 1.2 });
       prevId.current = selectedAssetId;
     }
   }, [selectedAssetId, assets, map]);
@@ -78,12 +75,15 @@ export default function AssetMapInner({
   onAssetSelect,
 }: AssetMapInnerProps) {
   const isDark = useDarkMode();
-  const mappedAssets = assets.filter((a) => a.latestScan);
+  const mappedAssets = assets.filter((a) => a.latestScan || a.liveSession);
 
-  const center: [number, number] =
-    mappedAssets.length > 0
-      ? [mappedAssets[0].latestScan!.latitude, mappedAssets[0].latestScan!.longitude]
-      : [-1.2921, 36.8219];
+  const firstPos = mappedAssets.length > 0
+    ? (mappedAssets[0].liveSession ?? mappedAssets[0].latestScan)
+    : null;
+
+  const center: [number, number] = firstPos
+    ? [firstPos.latitude, firstPos.longitude]
+    : [-1.2921, 36.8219];
 
   const tiles = isDark ? TILES.dark : TILES.light;
 

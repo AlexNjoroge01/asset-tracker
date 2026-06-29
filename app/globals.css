@@ -328,6 +328,24 @@ body {
   100% { transform: scale(1); }
 }
 
+/* ── Live tracking ring ── */
+.asset-pin-live-ring {
+  position: absolute;
+  top: -7px;
+  left: -7px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 2px solid;
+  pointer-events: none;
+  animation: pulse-live-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse-live-ring {
+  0%   { transform: scale(0.7); opacity: 0.9; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
 /* ═══════════════════════════════════════════
    Leaflet popup
 ═══════════════════════════════════════════ */

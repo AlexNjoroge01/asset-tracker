@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { X, MapPin, Clock, Target, Tag, Info, ExternalLink } from "lucide-react";
+import { X, MapPin, Clock, Target, Tag, Info, ExternalLink, Radio } from "lucide-react";
 import type { Asset } from "@/types";
 import { formatCoords, formatRelativeTime, getAccuracyLevel, categoryColor } from "@/lib/utils";
 
@@ -21,10 +21,19 @@ const accuracyConfig: Record<string, { label: string; color: string }> = {
 };
 
 export function AssetInfoCard({ asset, onClose }: AssetInfoCardProps) {
-  const scan = asset.latestScan;
+  const isLive = !!asset.liveSession;
+  // Prefer live session coordinates for display
+  const posData = asset.liveSession ?? asset.latestScan;
+  const timeLabel = isLive ? "Updated" : "Last scan";
+  const timeValue = isLive
+    ? formatRelativeTime(asset.liveSession!.updatedAt)
+    : asset.latestScan
+    ? formatRelativeTime(asset.latestScan.scannedAt)
+    : null;
+
   const s = statusConfig[asset.status] ?? statusConfig.inactive;
   const color = categoryColor(asset.category);
-  const accuracy = scan ? getAccuracyLevel(scan.accuracy) : null;
+  const accuracy = posData ? getAccuracyLevel(posData.accuracy) : null;
   const initials = asset.name
     .split(" ")
     .map((w) => w[0])
@@ -43,9 +52,17 @@ export function AssetInfoCard({ asset, onClose }: AssetInfoCardProps) {
           {initials}
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-foreground truncate leading-tight">
-            {asset.name}
-          </p>
+          <div className="flex items-center gap-1.5 min-w-0">
+            <p className="text-sm font-semibold text-foreground truncate leading-tight flex-1">
+              {asset.name}
+            </p>
+            {isLive && (
+              <span className="inline-flex items-center gap-1 text-[9px] font-bold uppercase text-green-400 bg-green-400/10 px-1.5 py-0.5 rounded-full shrink-0">
+                <span className="h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse" />
+                Live
+              </span>
+            )}
+          </div>
           <div className="flex items-center gap-1.5 mt-0.5">
             <span className={`h-1.5 w-1.5 rounded-full shrink-0 ${s.dot}`} />
             <span className={`text-[10px] font-medium ${s.text}`}>{s.label}</span>
@@ -81,20 +98,22 @@ export function AssetInfoCard({ asset, onClose }: AssetInfoCardProps) {
           </div>
         )}
 
-        {scan ? (
+        {posData ? (
           <>
-            <Row icon={<Clock className="h-3 w-3" />} label="Last scan">
-              {formatRelativeTime(scan.scannedAt)}
-            </Row>
+            {timeValue && (
+              <Row icon={isLive ? <Radio className="h-3 w-3" /> : <Clock className="h-3 w-3" />} label={timeLabel}>
+                <span className={isLive ? "text-green-400" : ""}>{timeValue}</span>
+              </Row>
+            )}
             <Row icon={<MapPin className="h-3 w-3" />} label="Coordinates">
               <span className="font-mono text-[10px]">
-                {formatCoords(scan.latitude, scan.longitude)}
+                {formatCoords(posData.latitude, posData.longitude)}
               </span>
             </Row>
             {accuracy && (
               <Row icon={<Target className="h-3 w-3" />} label="GPS accuracy">
                 <span className={`${accuracyConfig[accuracy].color} font-medium`}>
-                  {scan.accuracy != null ? `±${Math.round(scan.accuracy)}m` : "—"}
+                  {posData.accuracy != null ? `±${Math.round(posData.accuracy)}m` : "—"}
                   <span className="text-muted-foreground font-normal ml-1">
                     ({accuracyConfig[accuracy].label})
                   </span>

@@ -26,6 +26,13 @@ export interface LatestScan {
   accuracy: number | null;
 }
 
+export interface LiveSession {
+  latitude: number;
+  longitude: number;
+  accuracy: number | null;
+  updatedAt: Date;
+}
+
 export interface Asset {
   id: string;
   name: string;
@@ -36,6 +43,7 @@ export interface Asset {
   createdBy: string | null;
   createdAt: Date;
   latestScan: LatestScan | null;
+  liveSession: LiveSession | null;
 }
 
 export interface Scan {
