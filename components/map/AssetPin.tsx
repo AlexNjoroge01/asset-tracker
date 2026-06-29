@@ -1,9 +1,8 @@
 "use client";
 
-import { Marker, Popup } from "react-leaflet";
+import { Marker } from "react-leaflet";
 import type { Asset } from "@/types";
 import { categoryColor } from "@/lib/utils";
-import { AssetPopup } from "./AssetPopup";
 
 interface AssetPinProps {
   asset: Asset;
@@ -29,12 +28,15 @@ export function AssetPin({ asset, isSelected, onSelect }: AssetPinProps) {
   const L = typeof window !== "undefined" ? require("leaflet") : null;
   if (!L) return null;
 
+  const selectedStyle = isSelected
+    ? `box-shadow:0 0 0 3px #fff,0 0 0 5px ${color};`
+    : "";
+
   const icon = L.divIcon({
-    html: `<div class="asset-pin ${isLost ? "asset-pin-lost" : ""}" style="width:36px;height:36px;background:${color};opacity:${opacity}${isLost ? ";border:2px solid #f87171" : ""}">${initials}</div>`,
+    html: `<div class="asset-pin ${isLost ? "asset-pin-lost" : ""}" style="width:36px;height:36px;background:${color};opacity:${opacity}${isLost ? ";border:2px solid #f87171" : ""};${selectedStyle}">${initials}</div>`,
     className: "",
     iconSize: [36, 36],
     iconAnchor: [18, 18],
-    popupAnchor: [0, -20],
   });
 
   return (
@@ -42,10 +44,6 @@ export function AssetPin({ asset, isSelected, onSelect }: AssetPinProps) {
       position={[latitude, longitude]}
       icon={icon}
       eventHandlers={{ click: () => onSelect?.(asset.id) }}
-    >
-      <Popup>
-        <AssetPopup asset={asset} />
-      </Popup>
-    </Marker>
+    />
   );
 }
